@@ -1,0 +1,93 @@
+import streamlit as st
+import pandas as pd
+
+def my_page_config():
+    '''
+    Contains global formatting for text and spacing
+    '''
+
+    st.set_page_config(
+        page_title='Operations Request Module',
+        page_icon='🏬',
+        layout='wide'
+        )
+    
+       
+    st.markdown(
+    """
+    <style>
+    
+    .block-container {
+        padding-top: 0rem; /* Adjust this value as needed (e.g., 0rem for minimal padding) */
+        padding-bottom: 0rem;
+        padding-left: 5rem;
+        padding-right: 5rem;
+    }   
+
+    </style>
+    """,
+    unsafe_allow_html=True
+    )
+
+    
+    st.markdown("""
+    <style>
+
+    div[data-baseweb="tab-list"] {
+    display: flex;
+    gap: 0;}
+
+    button[data-baseweb="tab"] {
+        flex: 1;
+        font-size: 16px;
+        padding: 10px 16px;
+        text-align: center;
+        border: 3px solid transparent;   /* 👈 inactive border color */
+        color: #;}
+
+    /* Hover */
+    button[data-baseweb="tab"]:hover {
+        border-color: #000000;
+        border-radius: 15px 15px 0 0;
+        color: #ffffff;
+        background-color: #423738;}
+
+    /* Active tab */
+    button[data-baseweb="tab"][aria-selected="true"] {
+        border-color: #dfb011;      /* 👈 active border color */
+        color: #ffffff;
+        font-weight: 600;
+        border-radius: 15px 15px 0 0;
+        background-color: #423738;}
+    </style>
+    """, unsafe_allow_html=True)
+    
+
+def thin_gradient_line():
+    st.markdown("<hr style='border: 0; height: 5px; padding: 0; margin: 0; background: linear-gradient(to right, #d0c09e, #f4b315);'/>", unsafe_allow_html=True)
+
+def access_gsheet():
+    # access public google sheet
+    sheet_id = "1KqXTe99Vb5SR_1JTf-F8V1qPfhWmffPO"
+    gid = "807112605"
+    url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
+
+    # convert to dataframe
+    df = pd.read_csv(url)
+
+    # drop blank rows
+    df = df.dropna(how="all")
+
+    # rename column
+    df.rename(columns={
+        df.columns[0]:'Request_Date',
+        df.columns[1]:'Name'
+    }, inplace=True)
+
+    return df
+    
+
+
+
+
+
