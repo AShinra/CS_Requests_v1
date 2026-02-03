@@ -1,5 +1,5 @@
 import streamlit as st
-from common import get_logo, get_collection
+from common import get_collection
 from argon2 import PasswordHasher
 
 
@@ -69,12 +69,6 @@ if __name__ == '__main__':
     st.markdown("""<style>[data-testid="stSidebarHeader"] {height: 1rem;}</style>""", unsafe_allow_html=True)
     st.markdown("""<style>.stSidebar.st-emotion-cache-1legitb {background-color: black;}</style>""", unsafe_allow_html=True)
     
-    # try:
-    #     st.sidebar.image(get_logo())
-    # except Exception as e:
-    #     st.sidebar.warning("Logo cannot be loaded.")
-    #     st.exception(e)
-
     if "logged_in" not in st.session_state:
         st.session_state.logged_in = False
 
