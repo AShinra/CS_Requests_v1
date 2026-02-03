@@ -46,8 +46,10 @@ def dialog_signup():
             Welcome! 🎉
             Your account has been successfully created using the username you selected during sign-up. You can now log in and start using all available features.
 
+            Here are your account details:
             Username: {username}
             Password: {password}
+            https://requests-v1.streamlit.app/
 
             If you didn’t create this account or notice anything unusual, please contact our support team immediately.
 

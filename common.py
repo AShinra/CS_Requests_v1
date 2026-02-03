@@ -94,20 +94,20 @@ def access_gsheet():
 
 def send_test_email(recipient_email, text_to_insert):
     # Email details
-    # sender_email = st.secrets['my_email']['email']
-    # receiver_email = recipient_email
-    # password = st.secrets['my_email']['pass']  # not your normal password
+    sender_email = st.secrets['my_email']['email']
+    receiver_email = recipient_email
+    password = st.secrets['my_email']['pass']  # not your normal password
 
-    # msg = EmailMessage()
-    # msg["From"] = sender_email
-    # msg["To"] = receiver_email
-    # msg["Subject"] = "Welcome! Your Account Has Been Created"
-    # msg.set_content(text_to_insert)
+    msg = EmailMessage()
+    msg["From"] = sender_email
+    msg["To"] = receiver_email
+    msg["Subject"] = "Welcome! Your Account Has Been Created"
+    msg.set_content(text_to_insert)
 
-    # # Send email
-    # with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-    #     server.login(sender_email, password)
-    #     server.send_message(msg)
+    # Send email
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(sender_email, password)
+        server.send_message(msg)
 
     with st.spinner("Simulating email sending..."):
         time.sleep(2)  # Simulate delay
