@@ -2,7 +2,7 @@ import streamlit as st
 from mongodb import get_collection
 from argon2 import PasswordHasher
 from streamlit_option_menu import option_menu
-
+from signup import signup_user
 
 def main(username, rights):
 
@@ -135,13 +135,19 @@ if __name__ == '__main__':
                 label="**PASSWORD**",
                 type="password",
                 key='login_password')
-            submit_btn = st.button(
-                label='**LOGIN**',
-                use_container_width=True,
-                key='login_submit_btn'
-            )
+            cols = st.columns(2)
+            with cols[0]:
+                login_btn = st.button(
+                    label='**LOGIN**',
+                    use_container_width=True,
+                    key='login_submit_btn')
+            with cols[1]:
+                signup_btn = st.button(
+                    label='**SIGNUP**',
+                    use_container_width=True,
+                    key='signup_submit_btn')
 
-        if submit_btn:
+        if login_btn:
             doc = user_collection.find_one({"username": username})
             if not doc:
                 st.sidebar.error("No such user")
@@ -154,5 +160,8 @@ if __name__ == '__main__':
                     st.rerun()
                 except Exception:
                     st.sidebar.error("Wrong password")
+        
+        if signup_btn:
+            signup_user()
     
         

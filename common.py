@@ -1,5 +1,9 @@
 import streamlit as st
 import pandas as pd
+import smtplib
+from email.message import EmailMessage
+import random
+import string
 
 def my_page_config():
     '''
@@ -86,6 +90,32 @@ def access_gsheet():
 
     return df
     
+
+def send_test_email(recipient_email, text_to_insert):
+    # Email details
+    sender_email = "jonpuray@gmail.com"
+    receiver_email = recipient_email
+    password = "peux oxra nbpi jneq"  # not your normal password
+
+    msg = EmailMessage()
+    msg["From"] = sender_email
+    msg["To"] = receiver_email
+    msg["Subject"] = "Welcome! Your Account Has Been Created"
+    msg.set_content(text_to_insert)
+
+    # Send email
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(sender_email, password)
+        server.send_message(msg)
+
+    print("Email sent successfully!")
+
+def password_randomizer():
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for _ in range(12))
+    return password
+
+
 
 
 
