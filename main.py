@@ -1,5 +1,5 @@
 import streamlit as st
-from common import get_collection
+from mongodb import get_collection
 from argon2 import PasswordHasher
 
 
