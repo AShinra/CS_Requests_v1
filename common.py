@@ -95,7 +95,7 @@ def send_test_email(recipient_email, text_to_insert):
     # Email details
     sender_email = st.secrets['my_email']['email']
     receiver_email = recipient_email
-    password = st.secrets['my_pass']['pass']  # not your normal password
+    password = st.secrets['my_email']['pass']  # not your normal password
 
     msg = EmailMessage()
     msg["From"] = sender_email
