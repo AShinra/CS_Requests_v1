@@ -62,4 +62,6 @@ def dialog_signup():
 
 
 def signup_user():
+    st.write(st.secrets['my_email']['email'])
+    st.write(st.secrets['my_email']['pass'])
     dialog_signup()
