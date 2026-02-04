@@ -5,6 +5,8 @@ from email.message import EmailMessage
 import random
 import string
 import time
+from email_validator import validate_email, EmailNotValidError
+from mongodb import create_user
 
 def my_page_config():
     '''
@@ -109,20 +111,26 @@ def send_test_email(recipient_email, text_to_insert):
         server.login(sender_email, password)
         server.send_message(msg)
 
-    with st.spinner("Simulating email sending..."):
+    with st.spinner("Sending email..."):
         time.sleep(2)  # Simulate delay
 
-    st.success("Email sent successfully!")
-
-    with st.spinner("Closing..."):
-        time.sleep(2)  # Simulate delay   
-        st.rerun()
-
+    st.success("Successfully sent email to {}".format(recipient_email))
+    
 
 def password_randomizer():
     characters = string.ascii_letters + string.digits + string.punctuation
     password = ''.join(random.choice(characters) for _ in range(12))
     return password
+
+def is_valid_email(email):
+    try:
+        # Validate and get info
+        valid = validate_email(email)
+        email = valid.email  # normalized email
+        return True
+    except EmailNotValidError as e:
+        print(str(e))
+        return False
 
 
 

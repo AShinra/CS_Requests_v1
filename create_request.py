@@ -5,19 +5,7 @@ import pandas as pd
 from datetime import datetime
 # from cached_data import load_dataframe, load_or_update
 
-
-
-
-
-
-
-
-
-
-
-
-
-def input_page():
+def input_page(user_data):
 
     st.session_state['my_dataframe'] = pd.DataFrame()
 
@@ -28,48 +16,20 @@ def input_page():
     with col1:
         with st.container(border=True):
             st.markdown('#### Requester Details')
-            
-            cols = st.columns([1,3])
-            with cols[0]:
-                st.markdown('##### Name')
-            with cols[1]:
-                st.selectbox(
-                    label='requester_name',
-                    label_visibility='collapsed',
-                    options=[],
-                    placeholder='Select Name',
-                    index=None,
-                    key='requester_name')
-            
-            cols = st.columns([1,3])
-            with cols[0]:
-                st.markdown('##### Email')
-            with cols[1]:
-                st.text_input(
-                    label='requester_email',
-                    label_visibility='collapsed',
-                    key='requester_email')
+            st.markdown(f'{user_data["name"]}')
+            st.markdown(f'{user_data["email"]}')
                 
         with st.container(border=True):
             st.markdown('#### Client Info')
             
-            cols = st.columns([1,3])
-            with cols[0]:
-                st.markdown('##### Client')
-            with cols[1]:
-                st.text_input(
-                    label='client_name',
-                    label_visibility='collapsed',
-                    key='client_name')
-            
-            cols = st.columns([1,3])
-            with cols[0]:
-                st.markdown('##### Agency')
-            with cols[1]:
-                st.text_input(
-                    label='agency_name',
-                    label_visibility='collapsed',
-                    key='agency_name')
+            st.text_input(
+                label='Client Name',
+                key='client_name')
+        
+        
+            st.text_input(
+                label='Agenncy Name',
+                key='agency_name')
             
     with col2:
         with st.container(border=True):
@@ -158,50 +118,15 @@ def input_page():
                 
                 
 
-                
-
-                # df = add_row(doc)
-                # load_or_update(df)
-                # st.rerun()
-                                
-                # # check if it exist in temporary storage
-                # existing_doc = collection.find_one({
-                #     'requestor': doc['requestor'],
-                #     'client': doc['client'],
-                #     'agency': doc['agency'],
-                #     'request_date': doc['request_date'],
-                #     'team': doc['team'],
-                #     'request_type': doc['request_type'],
-                #     'details': doc['details'],
-                #     'url': doc['url']})
-
-                # if existing_doc:
-                #     pass
-                # else:
-                #     collection.insert_one(doc)
-
     # col1, col2 = st.columns([4,1])
     # with col1:
-        # collection = get_collection('temp')
-        # if collection.count_documents({}) > 0:
-        #     docs = list(collection.find({}))
-        #     df = pd.DataFrame(docs)
-        #     st.dataframe(df)
-        # df = load_dataframe(df)
-        # st.dataframe(df)
-
-
-
-
-    # tab1, tab2, tab3, tab4 = st.tabs(["Online", "Print", "Broadcast", "Provincial"])
-    # with tab1:
-    #     ''''''
-
-
-if __name__ == '__main__':
-
-    my_page_config()
-
-    st.sidebar.title('TEST')
+    #     collection = get_collection('temp')
+    #     if collection.count_documents({}) > 0:
+    #         docs = list(collection.find({}))
+    #         df = pd.DataFrame(docs)
+    #         st.dataframe(df)
         
-    input_page()
+
+
+
+

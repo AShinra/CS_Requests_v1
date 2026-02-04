@@ -2,33 +2,34 @@ import streamlit as st
 from mongodb import get_collection
 from argon2 import PasswordHasher
 from streamlit_option_menu import option_menu
-from signup import signup_user
+from signup import dialog_signup
+from create_request import input_page
 
 def main(username, rights):
 
+    user_collection = get_collection('users')
+    user_data = user_collection.find_one({'username':username})    
+
     with st.sidebar:
         if rights=='admin':
-            options_list=['Product Management', 'Stock Management', 'Tracking & Reports', 'Search & Filters', 'User Management']
-            icons_list=['box2-fill', 'bag-fill', 'body-text', 'search', 'people-fill']
-        elif rights=='sub-admin':
-            options_list=['Entry', 'Archive', 'Summary', 'Client Management']
-            icons_list=['pencil-square', 'archive', 'journals', 'gear']
+            options_list=['Create Request', 'Request Status']
+            icons_list=['file-plus', 'exclamation-triangle']
         else:
-            options_list=['Archive', 'Summary']
-            icons_list=['archive', 'journals']
+            options_list=['Create Request', 'Request Status']
+            icons_list=['box2-fill', 'bag-fill']
 
         st.sidebar.header(f':red[Welcome :blue[*{username.title()}*]] 👤')
         selected = option_menu(
-            menu_title='Warehouse Inventory',
+            menu_title='Request Module',
             menu_icon='list-columns',
             options=options_list,
             icons=icons_list
         )
         btn_clearcache = st.button('**Clear Cache**', use_container_width=True)
     
-    # client_list = []
-    # if selected=='Product Management':
-    #     product_management()
+    
+    if selected=='Create Request':
+        input_page(user_data)
             
     # elif selected=='Stock Management':
     #     stock_management()
@@ -162,6 +163,6 @@ if __name__ == '__main__':
                     st.sidebar.error("Wrong password")
         
         if signup_btn:
-            signup_user()
+            dialog_signup()
     
         

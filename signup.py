@@ -1,70 +1,82 @@
 import streamlit as st
-from common import password_randomizer, send_test_email
+from common import password_randomizer, send_test_email, is_valid_email
+from mongodb import create_user, check_email_exists
+from argon2 import PasswordHasher
 
 @st.dialog(title="Sign Up")
 def dialog_signup():
 
-    # *----------Name-----------*
-    cols = st.columns([1,3])
-    with cols[0]:
-        st.markdown('## Name')
-    with cols[1]:
-        st.text_input(
-            label='Name',
-            label_visibility='collapsed',
-            key='user_name')
-    
-    # *----------email-----------*
-    cols = st.columns([1,3])
-    with cols[0]:
-        st.markdown('## Email')
-    with cols[1]:
-        st.text_input(
-            label='Email',
-            label_visibility='collapsed',
-            key='user_email')
-
-    # *----------user-----------*
-    cols = st.columns([1,3])
-    with cols[0]:
-        st.markdown('## Username')
-    with cols[1]:
-        st.text_input(
-            label='Username',
-            label_visibility='collapsed',
-            key='user_username')
-    
-    if st.session_state['user_name'] and st.session_state['user_email'] and st.session_state['user_name']:
-        if st.button(label='Create User', key='user_create_btn', width='stretch'):
-            # generate randowm password
-            password = password_randomizer()
-            username = st.session_state['user_username']
-            _name = st.session_state['user_name']
-
-            text_to_insert = f"""Hi {_name},
+    with st.container(border=True):  
+        # *----------Name-----------*
+        cols = st.columns([2,5])
+        with cols[0]:
+            st.markdown('### Name:red[*]')
+        with cols[1]:
+            st.text_input(
+                label='Name',
+                label_visibility='collapsed',
+                key='user_name')
+        
+        # *----------user-----------*
+        cols = st.columns([2,5])
+        with cols[0]:
+            st.markdown('### Username:red[*]')
+        with cols[1]:
+            st.text_input(
+                label='Username',
+                label_visibility='collapsed',
+                key='user_username')
             
-            Welcome! 🎉
-            Your account has been successfully created using the username you selected during sign-up. You can now log in and start using all available features.
+        # *----------email-----------*
+        cols = st.columns([2,5])
+        with cols[0]:
+            st.markdown('### Email:red[*]')
+        with cols[1]:
+            st.text_input(
+                label='Email',
+                label_visibility='collapsed',
+                key='user_email')
 
-            Here are your account details:
-            Username: {username}
-            Password: {password}
-            https://requests-v1.streamlit.app/
+        
+    if st.session_state['user_name'] and st.session_state['user_email'] and st.session_state['user_username']:
+        if check_email_exists(st.session_state['user_email'])==True:
+            st.error("Email already exists. Please use a different email.")
+        else:
+            if is_valid_email(st.session_state['user_email'])==True:
+                if st.button(label='Create User', key='user_create_btn', width='stretch'):
+                    # generate randowm password
+                    password = password_randomizer()
+                    username = st.session_state['user_username']
+                    _name = st.session_state['user_name']
 
-            If you didn’t create this account or notice anything unusual, please contact our support team immediately.
+                    text_to_insert = f"""Hi {_name},
+                    
+                    Welcome! 🎉
+                    Your account has been successfully created using the username you selected during sign-up. You can now log in and start using all available features.
 
-            Thanks for signing up—we’re glad to have you with us!
+                    Here are your account details:
+                    Username: {username}
+                    Password: {password}
+                    https://requests-v1.streamlit.app/
 
-            Best regards,
-            The Operations Team""" 
+                    If you didn’t create this account or notice anything unusual, please contact our support team immediately.
 
-            send_test_email(st.session_state['user_email'], text_to_insert)
+                    Thanks for signing up—we’re glad to have you with us!
 
+                    Best regards,
+                    The Operations Team""" 
 
+                    send_test_email(st.session_state['user_email'], text_to_insert)
+                    
+                    ph = PasswordHasher()
+                    hashed_password = ph.hash(password)
+                    
+                    create_user({
+                        "name": st.session_state['user_name'],
+                        "username": st.session_state['user_username'],
+                        "email": st.session_state['user_email'],
+                        "password": hashed_password
+                    })
 
-
-
-
-
-def signup_user():
-    dialog_signup()
+            else:
+                st.error("Please enter a valid email address.")
