@@ -13,6 +13,11 @@ def connect_to_db():
     return client['requestdb']
 
 @st.cache_resource
+def connect_to_dbattachment():
+    client = connect_to_client()
+    return client['attachments']
+
+@st.cache_resource
 def get_collection(collection_name):
     my_db = connect_to_db()
     return my_db[collection_name]

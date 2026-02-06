@@ -1,8 +1,12 @@
 import streamlit as st
 from common import my_page_config, thin_gradient_line
-from mongodb import get_collection
+from mongodb import get_collection, connect_to_dbattachment
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, time
+import time
+from dialogs import dialog_attachment
+import gridfs
+import os
 # from cached_data import load_dataframe, load_or_update
 
 def input_page(user_data):
@@ -16,48 +20,48 @@ def input_page(user_data):
     with col1:
         with st.container(border=True):
             st.markdown('#### Requester Details')
-            st.markdown(f'{user_data["name"]}')
-            st.markdown(f'{user_data["email"]}')
+            thin_gradient_line()
+            cols = st.columns([1,3])
+            with cols[0]:
+                st.markdown('##### Date')
+            with cols[1]:
+                _date = datetime.now()
+                st.markdown(f'{_date.strftime("%B %d, %Y")}')
+            cols = st.columns([1,3])
+            with cols[0]:
+                st.markdown('##### Name')
+            with cols[1]:
+                st.markdown(f'{user_data["name"]}')
+            cols = st.columns([1,3])
+            with cols[0]:
+                st.markdown('##### Email')
+            with cols[1]:
+                st.markdown(f'{user_data["email"]}')
                 
         with st.container(border=True):
-            st.markdown('#### Client Info')
+            st.markdown('#### Assigned to')
+            thin_gradient_line()
+            cols = st.columns([1,3])
+            with cols[0]:
+                st.markdown('##### Team')
+            with cols[1]:
+                st.selectbox(
+                    label='ops_team',
+                    label_visibility='collapsed',
+                    options=['Broadcast', 'Online', 'Operations Manager', 'Print', 'Provincial'],
+                    placeholder='Select Team',
+                    index=None,
+                    key='ops_team')
             
-            st.text_input(
-                label='Client Name',
-                key='client_name')
-        
-        
-            st.text_input(
-                label='Agenncy Name',
-                key='agency_name')
+            
             
     with col2:
         with st.container(border=True):
-            st.markdown('#### Request Info')
-            cola, colb, colc = st.columns(3)
-            with cola:
-                cols = st.columns([1,3])
-                with cols[0]:
-                    st.markdown('##### Date')
-                with cols[1]:
-                    st.date_input(
-                        label='request_date',
-                        label_visibility='collapsed',
-                        key='request_date')
-            with colb:
-                cols = st.columns([1,3])
-                with cols[0]:
-                    st.markdown('##### Team')
-                with cols[1]:
-                    st.selectbox(
-                        label='ops_team',
-                        label_visibility='collapsed',
-                        options=['Broadcast', 'Online', 'Print', 'Provincial'],
-                        placeholder='Select Team',
-                        index=None,
-                        key='ops_team')
+            st.markdown('#### Request Details')
+            thin_gradient_line()
+            cola, colb = st.columns([1,2])
             
-            with colc:
+            with cola:
                 cols = st.columns([1,3])
                 with cols[0]:
                     st.markdown('##### Type')
@@ -65,56 +69,88 @@ def input_page(user_data):
                     st.selectbox(
                         label='request_type',
                         label_visibility='collapsed',
-                        options=['AdHoc', 'Regular', 'TOA'],
+                        options=['AAF', 'Validation', 'Others'],
                         placeholder='Select Request Type',
                         index=None,
                         key='request_type')
-            
-            cols = st.columns([1, 11])
-            with cols[0]:
-                st.markdown('##### URL')
-            with cols[1]:
-                st.text_area(
-                    label='request_url',
+                
+                cols = st.columns([1,3])
+                with cols[0]:
+                    st.markdown('##### Agency')
+                with cols[1]:
+                    st.text_input(
+                        label='Agency',
+                        label_visibility='collapsed',
+                        placeholder='Enter Agency Name',
+                        key='agency_name')
+                
+                cols = st.columns([1,3])
+                with cols[0]:
+                    st.markdown('##### Client')
+                with cols[1]:
+                    st.text_input(
+                        label='Client',
+                        label_visibility='collapsed',
+                        placeholder='Enter Client Name',
+                        key='client_name')
+                
+                st.markdown('##### Attachment')
+                file = st.file_uploader(
+                    label='Upload Attachment',
                     label_visibility='collapsed',
-                    key='request_url')
+                    key='attachment_file')
+                
+                
+                        
+                    
+                    
             
-            cols = st.columns([1,11])
-            with cols[0]:
-                st.markdown('##### Details')
-            with cols[1]:
+            with colb:           
                 st.text_area(
                     label='request_details',
                     label_visibility='collapsed',
+                    placeholder='Enter request details here',
+                    height=500,
                     key='request_details')
         
         if st.button(label='Add Entry', width='stretch'):
             
+            year_now = datetime.now().year
+            collection_len = get_collection('temp').count_documents({})
+            ticket_id = f'CS-{year_now}-{str(collection_len + 1).zfill(5)}'
             collection = get_collection('temp')
-
-            _urls = st.session_state['request_url']
-            urls = _urls.splitlines()
             
-            for _url in urls:
-                doc = {
-                    'requestor':st.session_state['requester_name'],
-                    'client':st.session_state['client_name'],
-                    'agency':st.session_state['agency_name'],
-                    'request_date':datetime.combine(st.session_state['request_date'],  datetime.min.time()),
-                    'team':st.session_state['ops_team'],
-                    'request_type':st.session_state['request_type'],
-                    'details':st.session_state['request_details'],
-                    'url':_url}
+            if file:
+                file_name = file.name
+
+            UPLOAD_DIR = "uploads"
+            os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+            file_path = os.path.join(UPLOAD_DIR, file_name)
+
+            fs = gridfs.GridFS(connect_to_dbattachment())
+            with open(file_path, "rb") as f:
+                file_id = fs.put(f, filename=file_name)
+
+            doc = {
+                'requestor':user_data["name"],
+                'client':st.session_state['client_name'],
+                'agency':st.session_state['agency_name'],
+                'request_date':datetime.combine(_date,  datetime.min.time()),
+                'team':st.session_state['ops_team'],
+                'request_type':st.session_state['request_type'],
+                'details':st.session_state['request_details'],
+                # 'attachment':st.session_state['attachment_file'],
+                'request_status':'Pending',
+                'ticket_id':ticket_id,
+                'file_id':str(file_id)}
+                        
+            with st.spinner('Adding entry...'):
+                collection.insert_one(doc)
+            
+            
                 
-                if st.session_state['my_dataframe'] == df.empty:
-                    df = pd.DataFrame()
-                else:
-                    df = st.data_editor(st.session_state['my_dataframe'])
-
-                df = pd.concat([df, pd.DataFrame([doc])], ignore_index=True)
-                st.session_state['my_dataframe'] = df
-
-                st.dataframe(st.session_state['my_dataframe'])
+                
                 
                 
 
