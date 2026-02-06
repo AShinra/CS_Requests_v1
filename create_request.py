@@ -120,17 +120,24 @@ def input_page(user_data):
             ticket_id = f'CS-{year_now}-{str(collection_len + 1).zfill(5)}'
             collection = get_collection('temp')
             
-            if file:
-                file_name = file.name
-
             UPLOAD_DIR = "uploads"
             os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-            file_path = os.path.join(UPLOAD_DIR, file_name)
+            if file is not None:
+                # 1️⃣ File name
+                file_name = file.name
 
-            fs = gridfs.GridFS(connect_to_dbattachment())
-            with open(file_path, "rb") as f:
-                file_id = fs.put(f, filename=file_name)
+                # 2️⃣ File path
+                file_path = os.path.join(UPLOAD_DIR, file_name)
+
+                # 3️⃣ Save file to disk
+                with open(file_path, "wb") as f:
+                    f.write(file.getbuffer())
+
+                # 4️⃣ Save to MongoDB GridFS
+                fs = gridfs.GridFS(connect_to_dbattachment())
+                with open(file_path, "rb") as f:
+                    file_id = fs.put(f, filename=file_name)
 
             doc = {
                 'requestor':user_data["name"],
