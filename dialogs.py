@@ -12,3 +12,12 @@ def dialog_attachment():
             time.sleep(2)
         
         return st.session_state['attachment_file']
+
+
+@st.dialog(title="Ticket Request Sent")
+def dialog_ticket_request(ticket_id, user_email):
+    st.markdown(f'#### Ticket Request Sent: {ticket_id}')
+    st.markdown(f'An email with the details of your ticket has been sent to **{user_email}**.')
+    with st.spinner('Closing.....'):
+        time.sleep(2)
+        st.rerun()

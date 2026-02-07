@@ -1,5 +1,5 @@
 import streamlit as st
-from common import password_randomizer, send_test_email, is_valid_email
+from common import password_randomizer, send_email, is_valid_email
 from mongodb import create_user, check_email_exists
 from argon2 import PasswordHasher
 
@@ -48,6 +48,7 @@ def dialog_signup():
                     password = password_randomizer()
                     username = st.session_state['user_username']
                     _name = st.session_state['user_name']
+                    _subject = "Welcome! Your Account Has Been Created"
 
                     text_to_insert = f"""Hi {_name},
                     
@@ -66,7 +67,10 @@ def dialog_signup():
                     Best regards,
                     The Operations Team""" 
 
-                    send_test_email(st.session_state['user_email'], text_to_insert)
+                    send_email(
+                        recipient_email=st.session_state['user_email'],
+                        email_subject=_subject,
+                        text_to_insert=text_to_insert)
                     
                     ph = PasswordHasher()
                     hashed_password = ph.hash(password)

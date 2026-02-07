@@ -94,7 +94,7 @@ def access_gsheet():
     return df
     
 
-def send_test_email(recipient_email, text_to_insert):
+def send_email(recipient_email, email_subject, text_to_insert):
     # Email details
     sender_email = st.secrets['my_email']['email']
     receiver_email = recipient_email
@@ -103,7 +103,7 @@ def send_test_email(recipient_email, text_to_insert):
     msg = EmailMessage()
     msg["From"] = sender_email
     msg["To"] = receiver_email
-    msg["Subject"] = "Welcome! Your Account Has Been Created"
+    msg["Subject"] = email_subject
     msg.set_content(text_to_insert)
 
     # Send email
