@@ -2,7 +2,7 @@ import streamlit as st
 from mongodb import get_collection
 from common import thin_gradient_line
 from dialogs import dialog_password_reset
-
+from datetime import datetime
 
 
 def my_profile_page(user_data):
@@ -26,9 +26,9 @@ def my_profile_page(user_data):
 
     # Contact Info
     st.subheader("Contact Info")
-    st.text(f"Email: {user_data['email']}")
-    st.text(f"Phone: {user_data['phone']}")
-    st.text(f"Location: {user_data['location']}")
-    st.text(f"Joined: {user_data['joined']}")
+    st.write(f"Email: {user_data['email']}")
+    st.write(f"Phone: {user_data['phone']}")
+    st.write(f"Location: {user_data['location']}")
+    st.write(f"Joined: {datetime.strptime(user_data['joined'], '%Y-%m-%d').strftime('%B %d, %Y')}")
 
     
