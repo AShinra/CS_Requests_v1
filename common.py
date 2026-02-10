@@ -8,6 +8,7 @@ import time
 from email_validator import validate_email, EmailNotValidError
 from mongodb import create_user
 
+
 def my_page_config():
     '''
     Contains global formatting for text and spacing
@@ -92,29 +93,73 @@ def access_gsheet():
     }, inplace=True)
 
     return df
-    
+
 
 def send_email(recipient_email, email_subject, text_to_insert):
-    # Email details
-    sender_email = st.secrets['my_email']['email']
-    receiver_email = recipient_email
-    password = st.secrets['my_email']['pass']  # not your normal password
-
+    sender_email = st.secrets['my_email']['email']   # no-reply@media-meter.com
+    password = st.secrets['my_email']['pass']        # M365 mailbox password
+    
     msg = EmailMessage()
     msg["From"] = sender_email
-    msg["To"] = receiver_email
+    msg["To"] = recipient_email
     msg["Subject"] = email_subject
     msg.set_content(text_to_insert)
 
-    # Send email
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(sender_email, password)
-        server.send_message(msg)
+    try:
+        with st.spinner("Sending email..."):
+            with smtplib.SMTP("smtp.office365.com", 587, timeout=30) as server:
+                server.ehlo()
+                server.starttls()
+                server.ehlo()
+                server.login(sender_email, password)
+                server.send_message(msg)
+            time.sleep(2)
+        st.success(f"Successfully sent email to {recipient_email}")
+    except Exception as e:
+        st.error(f"Failed to send email:\n{repr(e)}")
+        
+    
 
-    with st.spinner("Sending email..."):
-        time.sleep(2)  # Simulate delay
+# def send_email(recipient_email, email_subject, text_to_insert):
+#     # Email details
+#     sender_email = st.secrets['my_email']['email']
+#     receiver_email = recipient_email
+#     password = st.secrets['my_email']['pass']  # not your normal password
 
-    st.success("Successfully sent email to {}".format(recipient_email))
+#     msg = EmailMessage()
+#     msg["From"] = sender_email
+#     msg["To"] = receiver_email
+#     msg["Subject"] = email_subject
+#     msg.set_content(text_to_insert)
+
+#     # Send email
+#     # 465 with SSL (less common, but more secure)
+#     try:
+#         with st.spinner("Sending email..."):
+#             with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+#                 server.login(sender_email, password)
+#                 server.send_message(msg)
+#             time.sleep(2)  # Simulate delay
+#         st.success("Successfully sent email to {}".format(recipient_email))
+#     except Exception as e:
+#         st.error("Failed to send email: {}".format(e))
+
+    # 587 with TLS (more common)
+    # try:
+    #     with st.spinner("Sending email..."):
+    #         # Connect to Gmail SMTP with TLS
+    #         with smtplib.SMTP("smtp.gmail.com", 587) as server:
+    #             server.ehlo()          # optional, identifies with server
+    #             server.starttls()      # upgrade to secure TLS
+    #             server.ehlo()          # re-identify after TLS
+    #             server.login(sender_email, password)
+    #             server.send_message(msg)
+    #         time.sleep(1)  # small delay for UX
+
+    #     st.success(f"Successfully sent email to {recipient_email}")
+
+    # except Exception as e:
+    #     st.error(f"Failed to send email: {e}")
     
 
 def password_randomizer():
@@ -131,6 +176,9 @@ def is_valid_email(email):
     except EmailNotValidError as e:
         print(str(e))
         return False
+
+
+
 
 
 

@@ -2,6 +2,7 @@ import streamlit as st
 from common import password_randomizer, send_email, is_valid_email
 from mongodb import create_user, check_email_exists
 from argon2 import PasswordHasher
+import datetime
 
 @st.dialog(title="Sign Up")
 def dialog_signup():
@@ -79,8 +80,11 @@ def dialog_signup():
                         "name": st.session_state['user_name'],
                         "username": st.session_state['user_username'],
                         "email": st.session_state['user_email'],
-                        "password": hashed_password
-                    })
+                        "password": hashed_password,
+                        "rights": "user",
+                        "joined": datetime.now().date(),
+                        "phone": None,
+                        "location": None})
 
             else:
                 st.error("Please enter a valid email address.")

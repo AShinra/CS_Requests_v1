@@ -51,8 +51,7 @@ def input_page(user_data):
                     placeholder='Select Team',
                     index=None,
                     key='ops_team')
-            
-            
+                
             
     with col2:
         with st.container(border=True):
@@ -101,13 +100,7 @@ def input_page(user_data):
                         label_visibility='collapsed',
                         placeholder='Enter Client Name',
                         key='client_name')
-                
-                
-                
-                        
-                    
-                    
-            
+                                
             with colb:           
                 st.text_area(
                     label='request_details',
@@ -119,9 +112,9 @@ def input_page(user_data):
         if st.button(label='Add Entry', width='stretch'):
             
             year_now = datetime.now().year
-            collection_len = get_collection('temp').count_documents({})
+            collection_len = get_collection('tickets').count_documents({})
             ticket_id = f'CS-{year_now}-{str(collection_len + 1).zfill(5)}'
-            collection = get_collection('temp')
+            collection = get_collection('tickets')
             
             doc = {
                 'requestor':user_data["name"],
@@ -140,7 +133,6 @@ def input_page(user_data):
                 dialog_ticket_request(
                     ticket_id=ticket_id,
                     user_email=user_data["email"])
-                    # user_email='jonpuray@gmail.com')
                 send_email(
                     recipient_email=user_data["email"],
                     email_subject=f'Ticket Request Created: {ticket_id}',

@@ -4,6 +4,7 @@ from argon2 import PasswordHasher
 from streamlit_option_menu import option_menu
 from signup import dialog_signup
 from create_request import input_page
+from my_profile import my_profile_page
 
 def main(username, rights):
 
@@ -12,11 +13,11 @@ def main(username, rights):
 
     with st.sidebar:
         if rights=='admin':
-            options_list=['Create Request', 'Request Status']
-            icons_list=['file-plus', 'exclamation-triangle']
+            options_list=['Create Request', 'Request Status', 'My Tickets', 'My Profile', 'User Management']
+            icons_list=['file-plus', 'exclamation-triangle', 'ticket-detailed', 'person-lines-fill', 'people-fill']
         else:
-            options_list=['Create Request', 'Request Status']
-            icons_list=['box2-fill', 'bag-fill']
+            options_list=['Create Request', 'Request Status', 'My Tickets', 'My Profile']
+            icons_list=['file-plus', 'exclamation-triangle', 'ticket-detailed', 'person-lines-fill']
 
         st.sidebar.header(f':red[Welcome :blue[*{username.title()}*]] 👤')
         selected = option_menu(
@@ -30,6 +31,10 @@ def main(username, rights):
     
     if selected=='Create Request':
         input_page(user_data)
+    
+    if selected=='My Profile':
+        from my_profile import my_profile_page
+        my_profile_page(user_data)
             
     # elif selected=='Stock Management':
     #     stock_management()
