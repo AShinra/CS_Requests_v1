@@ -40,7 +40,10 @@ def create_user(userdata):
             'username':userdata['username'],
             'email':userdata['email'],
             'password_hash':userdata['password'],  # In production, hash the password
-            'rights':'user'})
+            'rights':'user',
+            'joined': userdata['joined'],
+            'phone': userdata['phone'],
+            'location': userdata['location']})
 
         time.sleep(10)
         st.rerun()
