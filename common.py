@@ -7,6 +7,7 @@ import string
 import time
 from email_validator import validate_email, EmailNotValidError
 from mongodb import create_user
+import requests
 
 
 def my_page_config():
@@ -96,27 +97,74 @@ def access_gsheet():
 
 
 def send_email(recipient_email, email_subject, text_to_insert):
-    sender_email = st.secrets['my_email']['email']   # no-reply@media-meter.com
-    password = st.secrets['my_email']['pass']        # M365 mailbox password
-    
-    msg = EmailMessage()
-    msg["From"] = sender_email
-    msg["To"] = recipient_email
-    msg["Subject"] = email_subject
-    msg.set_content(text_to_insert)
+    api_key = st.secrets["brevo"]["api_key"]
+    from_email = st.secrets["brevo"]["from_email"]
+    from_name = st.secrets["brevo"]["from_name"]
+
+    url = "https://api.brevo.com/v3/smtp/email"
+
+    headers = {
+        "accept": "application/json",
+        "api-key": api_key,
+        "content-type": "application/json"
+    }
+
+    payload = {
+        "sender": {
+            "name": from_name,
+            "email": from_email
+        },
+        "to": [
+            {"email": recipient_email}
+        ],
+        "subject": email_subject,
+        "textContent": text_to_insert
+    }
 
     try:
         with st.spinner("Sending email..."):
-            with smtplib.SMTP("smtp.office365.com", 587, timeout=30) as server:
-                server.ehlo()
-                server.starttls()
-                server.ehlo()
-                server.login(sender_email, password)
-                server.send_message(msg)
-            time.sleep(2)
+            response = requests.post(
+                url,
+                headers=headers,
+                json=payload,
+                timeout=30
+            )
+
+            if response.status_code not in (200, 201):
+                raise Exception(response.text)
+
+            time.sleep(1)
+
         st.success(f"Successfully sent email to {recipient_email}")
+        return True
+
     except Exception as e:
         st.error(f"Failed to send email:\n{repr(e)}")
+        return False
+
+
+# def send_email(recipient_email, email_subject, text_to_insert):
+#     sender_email = st.secrets['my_email']['email']   # no-reply@media-meter.com
+#     password = st.secrets['my_email']['pass']        # M365 mailbox password
+    
+#     msg = EmailMessage()
+#     msg["From"] = sender_email
+#     msg["To"] = recipient_email
+#     msg["Subject"] = email_subject
+#     msg.set_content(text_to_insert)
+
+#     try:
+#         with st.spinner("Sending email..."):
+#             with smtplib.SMTP("smtp.office365.com", 587, timeout=30) as server:
+#                 server.ehlo()
+#                 server.starttls()
+#                 server.ehlo()
+#                 server.login(sender_email, password)
+#                 server.send_message(msg)
+#             time.sleep(2)
+#         st.success(f"Successfully sent email to {recipient_email}")
+#     except Exception as e:
+#         st.error(f"Failed to send email:\n{repr(e)}")
         
     
 

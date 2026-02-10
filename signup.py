@@ -3,7 +3,7 @@ from common import password_randomizer, send_email, is_valid_email
 from mongodb import create_user, check_email_exists
 from argon2 import PasswordHasher
 import datetime
-from datetime import datetime
+from datetime import datetime, date
 
 @st.dialog(title="Sign Up")
 def dialog_signup():
@@ -69,23 +69,23 @@ def dialog_signup():
                     Best regards,
                     The Operations Team""" 
 
-                    send_email(
+                    if send_email(
                         recipient_email=st.session_state['user_email'],
                         email_subject=_subject,
-                        text_to_insert=text_to_insert)
-                    
-                    ph = PasswordHasher()
-                    hashed_password = ph.hash(password)
-                    
-                    create_user({
-                        "name": st.session_state['user_name'],
-                        "username": st.session_state['user_username'],
-                        "email": st.session_state['user_email'],
-                        "password": hashed_password,
-                        "rights": "user",
-                        "joined": datetime.now().date(),
-                        "phone": None,
-                        "location": None})
+                        text_to_insert=text_to_insert) == True:
+                                        
+                        ph = PasswordHasher()
+                        hashed_password = ph.hash(password)
+                        
+                        create_user({
+                            "name": st.session_state['user_name'],
+                            "username": st.session_state['user_username'],
+                            "email": st.session_state['user_email'],
+                            "password": hashed_password,
+                            "rights": "user",
+                            "joined": date.today().strftime("%Y-%m-%d"),
+                            "phone": None,
+                            "location": None})
 
             else:
                 st.error("Please enter a valid email address.")
